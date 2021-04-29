@@ -8,10 +8,10 @@ using FirstWebAPIDemo.Models;
 
 namespace FirstWebAPIDemo.Controllers
 {
-    //comment
+    
     public class EmployeesController : ApiController
     {
-        public IEnumerable<Employee> Get()
+        /*public IEnumerable<Employee> Get()
         {
             using (EmployeeDBContext dbContext = new EmployeeDBContext())
             {
@@ -23,6 +23,39 @@ namespace FirstWebAPIDemo.Controllers
             using (EmployeeDBContext dbContext = new EmployeeDBContext())
             {
                 return dbContext.Employees.FirstOrDefault(e => e.ID == id);
+            }
+        }*/
+        public HttpResponseMessage Get()
+        {
+            using (EmployeeDBContext dbContext = new EmployeeDBContext())
+            {
+                var Employees = dbContext.Employees.ToList();
+                return Request.CreateResponse(HttpStatusCode.OK, Employees);
+            }
+        }
+        public IHttpActionResult Get(int id)
+        {
+            using (EmployeeDBContext dbContext = new EmployeeDBContext())
+            {
+                var entity = dbContext.Employees.FirstOrDefault(e => e.ID == id);
+
+                if (entity != null)
+                {
+                    return Ok(entity);
+                }
+                else
+                {
+                    //return NotFound();
+                    //throw new HttpResponseException(Request.CreateErrorResponse(HttpStatusCode.NotFound, "Employee with ID " + id.ToString() + "not found"));
+                    //see https://www.infoworld.com/article/2994111/how-to-handle-errors-in-aspnet-web-api.html
+                    return ResponseMessage(
+                            Request.CreateResponse(
+                                HttpStatusCode.NotFound,
+                                "Employee with ID " + id.ToString() + " not found"
+                            )
+                        );
+                    //see https://stackoverflow.com/questions/20139621/how-do-i-return-notfound-ihttpactionresult-with-an-error-message-or-exception
+                }
             }
         }
     }
